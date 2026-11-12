@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriLife Hub - Modern Nutrition & Meal Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Font Plus Jakarta Sans & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            950: '#022c22'
+                        },
+                        indigo: {
+                            500: '#6366f1',
+                            600: '#4f46e5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar & Aesthetics */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .glass-card-hover:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.15);
+        }
+        .glow-emerald {
+            box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.35);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black min-h-full flex flex-col justify-between text-slate-200">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 glass-card border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <!-- Brand Logo -->
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/20">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-xl tracking-tight text-white flex items-center gap-1.5">
+                            NutriLife <span class="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">Hub</span>
+                        </h1>
+                        <p class="text-[11px] text-slate-400 font-medium hidden sm:block">Modern Smart Nutrition & Macro Tracker</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="flex p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800/80 space-x-1">
+                    <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="nav-tab px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md">
+                        <i class="fa-solid fa-chart-line text-sm"></i>
+                        <span class="hidden md:inline">Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('calculator')" id="tab-btn-calculator" class="nav-tab px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <i class="fa-solid fa-calculator text-sm"></i>
+                        <span class="hidden md:inline">Kalkulator Gizi</span>
+                    </button>
+                    <button onclick="switchTab('rules')" id="tab-btn-rules" class="nav-tab px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <i class="fa-solid fa-book-open-reader text-sm"></i>
+                        <span class="hidden md:inline">Panduan & Diet</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+
+        <!-- ================= SECTION 1: DASHBOARD (MEAL LOG & WATER) ================= -->
+        <section id="section-dashboard" class="space-y-8">
+            <!-- Top Summary Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+                <!-- Kalori Target Card -->
+                <div class="glass-card p-6 rounded-3xl border border-slate-800/80 shadow-xl flex flex-col justify-between transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Kalori Harian</p>
+                            <h3 class="text-2xl font-black text-white mt-1" id="dash-calories-text">0 / 2000 kcal</h3>
+                        </div>
+                        <div class="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+                            <i class="fa-solid fa-fire text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <div class="w-full bg-slate-800/80 h-3 rounded-full overflow-hidden p-0.5 border border-slate-700/30">
+                            <div id="dash-calories-bar" class="bg-gradient-to-r from-amber-500 to-orange-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2.5 flex justify-between font-medium">
+                            <span>Sisa: <strong id="dash-calories-left" class="text-slate-200">2000</strong> kcal</span>
+                            <span id="dash-calories-percent" class="font-bold text-amber-400">0%</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Protein Card -->
+                <div class="glass-card p-6 rounded-3xl border border-slate-800/80 shadow-xl flex flex-col justify-between transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Protein</p>
+                            <h3 class="text-2xl font-black text-white mt-1" id="dash-protein-text">0 / 120 g</h3>
+                        </div>
+                        <div class="w-11 h-11 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
+                            <i class="fa-solid fa-drumstick-bite text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <div class="w-full bg-slate-800/80 h-3 rounded-full overflow-hidden p-0.5 border border-slate-700/30">
+                            <div id="dash-protein-bar" class="bg-gradient-to-r from-rose-500 to-pink-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2.5 text-right font-medium" id="dash-protein-percent">0%</p>
+                    </div>
+                </div>
+
+                <!-- Karbohidrat Card -->
+                <div class="glass-card p-6 rounded-3xl border border-slate-800/80 shadow-xl flex flex-col justify-between transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Karbohidrat</p>
+                            <h3 class="text-2xl font-black text-white mt-1" id="dash-carbs-text">0 / 250 g</h3>
+                        </div>
+                        <div class="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                            <i class="fa-solid fa-wheat-awn text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <div class="w-full bg-slate-800/80 h-3 rounded-full overflow-hidden p-0.5 border border-slate-700/30">
+                            <div id="dash-carbs-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2.5 text-right font-medium" id="dash-carbs-percent">0%</p>
+                    </div>
+                </div>
+
+                <!-- Lemak Card -->
+                <div class="glass-card p-6 rounded-3xl border border-slate-800/80 shadow-xl flex flex-col justify-between transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Lemak</p>
+                            <h3 class="text-2xl font-black text-white mt-1" id="dash-fat-text">0 / 55 g</h3>
+                        </div>
+                        <div class="w-11 h-11 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                            <i class="fa-solid fa-seedling text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <div class="w-full bg-slate-800/80 h-3 rounded-full overflow-hidden p-0.5 border border-slate-700/30">
+                            <div id="dash-fat-bar" class="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2.5 text-right font-medium" id="dash-fat-percent">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area: Meal Planner + Water Tracker -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column (2/3): Form Input & Log Makanan -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Form Input Makanan -->
+                    <div class="glass-card p-7 rounded-3xl border border-slate-800/80 shadow-2xl relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                        <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-plus"></i>
+                            </span>
+                            Tambah Log Makanan Harian
+                        </h2>
+                        <form id="meal-form" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Nama Makanan / Minuman *</label>
+                                    <input type="text" id="meal-name" placeholder="Misal: Nasi Dada Ayam + Telur" required class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/60 transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Waktu Makan *</label>
+                                    <select id="meal-time" required class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/60 transition-all">
+                                        <option value="Sarapan">Sarapan (Breakfast)</option>
+                                        <option value="Makan Siang">Makan Siang (Lunch)</option>
+                                        <option value="Makan Malam">Makan Malam (Dinner)</option>
+                                        <option value="Cemilan">Cemilan (Snack)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Kalori (kcal) *</label>
+                                    <input type="number" id="meal-calories" min="0" placeholder="0" required class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/60 transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Protein (g)</label>
+                                    <input type="number" id="meal-protein" min="0" placeholder="0" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/60 transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Karbo (g)</label>
+                                    <input type="number" id="meal-carbs" min="0" placeholder="0" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/60 transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Lemak (g)</label>
+                                    <input type="number" id="meal-fat" min="0" placeholder="0" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/60 transition-all">
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end pt-2">
+                                <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-check"></i> Simpan Catatan Makan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Catatan Riwayat Makanan -->
+                    <div class="glass-card p-7 rounded-3xl border border-slate-800/80 shadow-2xl">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-utensils"></i>
+                                </span>
+                                Riwayat Konsumsi Hari Ini
+                            </h2>
+                            <button onclick="clearAllMeals()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1.5 transition-colors">
+                                <i class="fa-regular fa-trash-can"></i> Hapus Semua
+                            </button>
+                        </div>
+
+                        <!-- Daftar Makanan Container -->
+                        <div id="meal-list-container" class="space-y-4">
+                            <!-- JS Will Render Content Here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (1/3): Water Tracker & Quick Tips -->
+                <div class="space-y-8">
+                    <!-- Water Intake Counter Card -->
+                    <div class="glass-card p-7 rounded-3xl border border-slate-800/80 shadow-2xl relative overflow-hidden">
+                        <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-droplet"></i>
+                                </span>
+                                Water Tracker
+                            </h2>
+                            <button onclick="resetWater()" class="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                                <i class="fa-solid fa-rotate-left"></i> Reset
+                            </button>
+                        </div>
+
+                        <!-- Radial / Visual Progress Air -->
+                        <div class="text-center my-6">
+                            <div class="relative w-40 h-40 mx-auto flex items-center justify-center">
+                                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                    <path class="text-slate-800/80" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <path id="water-progress-circle" class="text-cyan-400 transition-all duration-700 ease-out" stroke-dasharray="0, 100" stroke-width="3.2" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                </svg>
+                                <div class="absolute flex flex-col items-center">
+                                    <i class="fa-solid fa-glass-water text-cyan-400 text-2xl mb-1 drop-shadow"></i>
+                                    <span class="text-2xl font-black text-white tracking-tight" id="water-current-text">0</span>
+                                    <span class="text-xs text-slate-400 font-medium">/ <span id="water-target-text">2000</span> ml</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Add Buttons -->
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <button onclick="addWater(250)" class="px-3 py-2.5 bg-slate-900/90 hover:bg-cyan-500/10 text-cyan-400 rounded-xl text-xs font-bold border border-slate-800 hover:border-cyan-500/30 transition-all">
+                                +250 ml
+                            </button>
+                            <button onclick="addWater(500)" class="px-3 py-2.5 bg-slate-900/90 hover:bg-cyan-500/10 text-cyan-400 rounded-xl text-xs font-bold border border-slate-800 hover:border-cyan-500/30 transition-all">
+                                +500 ml
+                            </button>
+                            <button onclick="addWater(600)" class="px-3 py-2.5 bg-slate-900/90 hover:bg-cyan-500/10 text-cyan-400 rounded-xl text-xs font-bold border border-slate-800 hover:border-cyan-500/30 transition-all">
+                                +600 ml
+                            </button>
+                        </div>
+
+                        <!-- Target Edit Input -->
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-800/80">
+                            <label class="text-xs text-slate-400 font-medium">Target Air Harian:</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="water-target-input" value="2000" step="100" class="w-20 px-2.5 py-1 text-xs bg-slate-900 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                                <button onclick="updateWaterTarget()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg font-semibold transition-colors">Set</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Nutrition Tip Card -->
+                    <div class="bg-gradient-to-br from-emerald-600 via-teal-700 to-slate-900 p-7 rounded-3xl text-white shadow-xl relative overflow-hidden border border-emerald-500/30">
+                        <div class="flex items-center gap-2 text-emerald-200 font-bold text-xs tracking-wider uppercase mb-3">
+                            <i class="fa-solid fa-lightbulb text-amber-300"></i> Smart Health Tip
+                        </div>
+                        <h4 class="font-extrabold text-base mb-2">Prinsip Piring Makan Sehat</h4>
+                        <p class="text-xs text-slate-200 leading-relaxed font-normal">
+                            Bagi piring Anda menjadi: <strong class="text-emerald-300">50% Sayur & Buah</strong>, <strong class="text-teal-200">25% Protein Utuh</strong>, dan <strong class="text-amber-200">25% Karbohidrat Kompleks</strong>. Minum air cukup & kurangi gula berlebih!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: KALKULATOR GIZI & KALORI ================= -->
+        <section id="section-calculator" class="hidden space-y-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="glass-card p-7 sm:p-9 rounded-3xl border border-slate-800/80 shadow-2xl">
+                    <div class="mb-8 border-b border-slate-800/80 pb-5">
+                        <h2 class="text-xl font-extrabold text-white">Kalkulator Kebutuhan Kalori & Makronutrisi</h2>
+                        <p class="text-xs text-slate-400 mt-1">Estimasi BMR dan TDEE terakurat menggunakan rumus ilmiah Mifflin-St Jeor.</p>
+                    </div>
+
+                    <form id="calc-form" class="space-y-6">
+                        <!-- Personal Metrics Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Jenis Kelamin *</label>
+                                <select id="calc-gender" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500/60">
+                                    <option value="male">Pria</option>
+                                    <option value="female">Wanita</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Umur (tahun) *</label>
+                                <input type="number" id="calc-age" value="25" min="10" max="100" required class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500/60">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Tinggi Badan (cm) *</label>
+                                <input type="number" id="calc-height" value="170" min="50" max="250" required class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500/60">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Berat Badan (kg) *</label>
+                                <input type="number" id="calc-weight" value="65" min="20" max="300" required class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500/60">
+                            </div>
+                        </div>
+
+                        <!-- Activity Level & Goal Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Tingkat Aktivitas Fisik *</label>
+                                <select id="calc-activity" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500/60">
+                                    <option value="1.2">Sangat Jarang Olahraga (Sedentary)</option>
+                                    <option value="1.375">Aktivitas Ringan (Olahraga 1-3x/minggu)</option>
+                                    <option value="1.55" selected>Aktivitas Sedang (Olahraga 3-5x/minggu)</option>
+                                    <option value="1.725">Aktivitas Berat (Olahraga 6-7x/minggu)</option>
+                                    <option value="1.9">Aktivitas Ekstrem (Atlet / Pekerja Fisik Berat)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Target Kesehatan / Berat Badan *</label>
+                                <select id="calc-goal" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500/60">
+                                    <option value="weight-loss">Menurunkan Berat Badan (Defisit ~500 kcal)</option>
+                                    <option value="maintenance" selected>Menjaga Berat Badan (Maintenance)</option>
+                                    <option value="weight-gain">Menambah Berat Badan (Surplus ~500 kcal)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="calculateNutrition()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-calculator"></i> Hitung Kebutuhan Nutrisi Saya
+                        </button>
+                    </form>
+
+                    <!-- Calculator Results Box -->
+                    <div id="calc-results" class="mt-8 pt-8 border-t border-slate-800/80">
+                        <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4">Hasil Estimasi Kebutuhan Harian:</h3>
+                        
+                        <!-- Primary Metrics Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 text-center">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase">BMR (Metabolisme Basal)</span>
+                                <div class="text-2xl font-black text-white mt-1" id="res-bmr">0 kcal</div>
+                                <span class="text-[10px] text-slate-500">Energi minimal tubuh istirahat</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 text-center">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase">TDEE (Kebutuhan Total)</span>
+                                <div class="text-2xl font-black text-white mt-1" id="res-tdee">0 kcal</div>
+                                <span class="text-[10px] text-slate-500">Kalori jaga berat badan</span>
+                            </div>
+                            <div class="bg-emerald-500/10 p-5 rounded-2xl border border-emerald-500/30 text-center">
+                                <span class="text-[11px] font-bold text-emerald-400 uppercase">Target Kalori Harian</span>
+                                <div class="text-2xl font-black text-emerald-400 mt-1" id="res-target-cal">0 kcal</div>
+                                <span class="text-[10px] text-emerald-300/70 font-medium">Sesuai dengan target Anda</span>
+                            </div>
+                        </div>
+
+                        <!-- Breakdown Makronutrisi -->
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Rekomendasi Makronutrisi:</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                            <div class="p-4 rounded-2xl border border-rose-500/20 bg-rose-500/5">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold text-rose-400">Protein (30%)</span>
+                                    <i class="fa-solid fa-drumstick-bite text-rose-400 text-xs"></i>
+                                </div>
+                                <div class="text-xl font-extrabold text-white" id="res-protein-g">0 g</div>
+                                <span class="text-xs text-slate-500" id="res-protein-cal">0 kcal</span>
+                            </div>
+
+                            <div class="p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold text-emerald-400">Karbohidrat (50%)</span>
+                                    <i class="fa-solid fa-wheat-awn text-emerald-400 text-xs"></i>
+                                </div>
+                                <div class="text-xl font-extrabold text-white" id="res-carbs-g">0 g</div>
+                                <span class="text-xs text-slate-500" id="res-carbs-cal">0 kcal</span>
+                            </div>
+
+                            <div class="p-4 rounded-2xl border border-indigo-500/20 bg-indigo-500/5">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold text-indigo-400">Lemak (20%)</span>
+                                    <i class="fa-solid fa-seedling text-indigo-400 text-xs"></i>
+                                </div>
+                                <div class="text-xl font-extrabold text-white" id="res-fat-g">0 g</div>
+                                <span class="text-xs text-slate-500" id="res-fat-cal">0 kcal</span>
+                            </div>
+                        </div>
+
+                        <!-- Apply Button -->
+                        <button onclick="applyCalculatedGoals()" class="w-full py-3 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 font-bold rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-check"></i> Gunakan Target Ini di Dashboard Saya
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 3: PANDUAN & ATURAN POLA MAKAN ================= -->
+        <section id="section-rules" class="hidden space-y-8">
+            <!-- Filter Tabs Pola Makan -->
+            <div class="glass-card p-4 rounded-3xl border border-slate-800/80 shadow-xl">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Filter Rekomendasi Diet:</p>
+                <div class="flex flex-wrap gap-2" id="diet-filter-buttons">
+                    <button onclick="filterDiet('all')" class="diet-btn active px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md">Semua Panduan</button>
+                    <button onclick="filterDiet('if')" class="diet-btn px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white">Intermittent Fasting (16/8)</button>
+                    <button onclick="filterDiet('lowcarb')" class="diet-btn px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white">Low Carb / Keto</button>
+                    <button onclick="filterDiet('highprotein')" class="diet-btn px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white">High Protein / Muscle</button>
+                    <button onclick="filterDiet('balanced')" class="diet-btn px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white">Gizi Seimbang</button>
+                </div>
+            </div>
+
+            <!-- Content Grid Rules -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Card 1: Piring Makanku -->
+                <div class="diet-card glass-card p-7 rounded-3xl border border-slate-800/80 shadow-xl space-y-4 glass-card-hover transition-all" data-category="balanced all">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <h3 class="font-extrabold text-white text-base">Prinsip Piring Makanku (Gizi Seimbang)</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Panduan visual resmi porsi nutrisi ideal saat makan besar:
+                    </p>
+                    <ul class="text-xs text-slate-300 space-y-2 list-disc list-inside font-medium">
+                        <li><strong class="text-emerald-400">50% Piring:</strong> Sayur-sayuran dan buah-buahan berserat tinggi.</li>
+                        <li><strong class="text-amber-400">25% Piring:</strong> Karbohidrat kompleks (Nasi merah, ubi, oat).</li>
+                        <li><strong class="text-rose-400">25% Piring:</strong> Protein tanpa lemak (Dada ayam, ikan, tahu, tempe).</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2: Jadwal Makan Ideal -->
+                <div class="diet-card glass-card p-7 rounded-3xl border border-slate-800/80 shadow-xl space-y-4 glass-card-hover transition-all" data-category="balanced all if">
+                    <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-regular fa-clock"></i>
+                    </div>
+                    <h3 class="font-extrabold text-white text-base">Jadwal Makan Sirkadian Ideal</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Menjaga konsistensi metabolik tubuh dengan pengaturan jam makan presisi:
+                    </p>
+                    <ul class="text-xs text-slate-300 space-y-2 font-medium">
+                        <li><strong class="text-cyan-400">Sarapan:</strong> 07.00 - 08.30 (Stabilkan energi awal hari).</li>
+                        <li><strong class="text-cyan-400">Makan Siang:</strong> 12.00 - 13.30 (Porsi utama puncak metabolisme).</li>
+                        <li><strong class="text-cyan-400">Makan Malam:</strong> 18.30 - 19.30 (Minimal 3 jam sebelum tidur).</li>
+                    </ul>
+                </div>
+
+                <!-- Card 3: Intermittent Fasting Guide -->
+                <div class="diet-card glass-card p-7 rounded-3xl border border-slate-800/80 shadow-xl space-y-4 glass-card-hover transition-all" data-category="if all">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <h3 class="font-extrabold text-white text-base">Intermittent Fasting (Pola 16/8)</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Metode pembatasan waktu makan untuk sensitivitas insulin & autofagi sel:
+                    </p>
+                    <ul class="text-xs text-slate-300 space-y-2 list-disc list-inside font-medium">
+                        <li><strong class="text-purple-400">Jendela Makan:</strong> 12.00 Siang s/d 20.00 Malam (8 Jam).</li>
+                        <li><strong class="text-purple-400">Jendela Puasa:</strong> 20.00 Malam s/d 12.00 Siang besok (16 Jam).</li>
+                        <li><strong class="text-purple-400">Selama Puasa:</strong> Boleh minum air putih, kopi/teh tawar tanpa gula.</li>
+                    </ul>
+                </div>
+
+                <!-- Card 4: Low Carb / Keto Rules -->
+                <div class="diet-card glass-card p-7 rounded-3xl border border-slate-800/80 shadow-xl space-y-4 glass-card-hover transition-all" data-category="lowcarb all">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-wheat-awn-circle-exclamation"></i>
+                    </div>
+                    <h3 class="font-extrabold text-white text-base">Diet Rendah Karbohidrat (Low Carb)</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Membatasi karbohidrat untuk memaksimalkan penggunaan lemak sebagai energi:
+                    </p>
+                    <ul class="text-xs text-slate-300 space-y-2 list-disc list-inside font-medium">
+                        <li><strong class="text-rose-400">Batasi Ketat:</strong> Gula olahan, soda, tepung, mi, nasi putih berlebih.</li>
+                        <li><strong class="text-emerald-400">Perbanyak:</strong> Protein, lemak sehat (Alpukat, olive oil, kacang-kacangan).</li>
+                        <li><strong class="text-amber-400">Target Karbo:</strong> Dibawah 50g - 100g per hari.</li>
+                    </ul>
+                </div>
+
+                <!-- Card 5: High Protein / Muscle Gain -->
+                <div class="diet-card glass-card p-7 rounded-3xl border border-slate-800/80 shadow-xl space-y-4 glass-card-hover transition-all" data-category="highprotein all">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-dumbbell"></i>
+                    </div>
+                    <h3 class="font-extrabold text-white text-base">High Protein & Muscle Growth</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Fokus sintesis protein otot & pemulihan energi setelah latihan berat:
+                    </p>
+                    <ul class="text-xs text-slate-300 space-y-2 list-disc list-inside font-medium">
+                        <li><strong class="text-rose-400">Target Asupan:</strong> 1.6g - 2.2g protein per kg berat badan.</li>
+                        <li><strong class="text-rose-400">Sumber Utama:</strong> Dada ayam, putih telur, salmon, tempe, susu whey.</li>
+                        <li><strong class="text-rose-400">Distribusi:</strong> Konsumsi protein merata dalam 4-5 kali makan.</li>
+                    </ul>
+                </div>
+
+                <!-- Card 6: Makanan Dianjurkan vs Dibatasi -->
+                <div class="diet-card glass-card p-7 rounded-3xl border border-slate-800/80 shadow-xl space-y-4 glass-card-hover transition-all" data-category="balanced all lowcarb highprotein">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                    <h3 class="font-extrabold text-white text-base">Whole Foods vs Ultra-Processed</h3>
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="bg-emerald-500/10 p-3.5 rounded-2xl border border-emerald-500/20">
+                            <strong class="text-emerald-400 block mb-1">✔ Prioritaskan:</strong>
+                            <p class="text-slate-300 font-medium">Daging utuh, ikan segar, buah segar, sayur, kacang-kacangan.</p>
+                        </div>
+                        <div class="bg-rose-500/10 p-3.5 rounded-2xl border border-rose-500/20">
+                            <strong class="text-rose-400 block mb-1">✖ Batasi:</strong>
+                            <p class="text-slate-300 font-medium">Makanan kaleng berkimia, sosis, gorengan, soda, permen.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-card border-t border-slate-800/80 py-5 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium">
+            NutriLife Hub &copy; 2026 - Premium Health & Nutrition Tracker Platform.
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // ================= STATE MANAGEMENT & LOCALSTORAGE =================
+        const DEFAULT_GOALS = {
+            calories: 2000,
+            protein: 120,
+            carbs: 250,
+            fat: 55,
+            water: 2000
+        };
+
+        let userGoals = JSON.parse(localStorage.getItem('nutri_goals')) || DEFAULT_GOALS;
+        let meals = JSON.parse(localStorage.getItem('nutri_meals')) || [];
+        let currentWater = parseInt(localStorage.getItem('nutri_water')) || 0;
+
+        // Save State to LocalStorage
+        function saveData() {
+            localStorage.setItem('nutri_goals', JSON.stringify(userGoals));
+            localStorage.setItem('nutri_meals', JSON.stringify(meals));
+            localStorage.setItem('nutri_water', currentWater.toString());
+        }
+
+        // ================= TAB NAVIGATION =================
+        function switchTab(tabName) {
+            // Hide all sections
+            document.getElementById('section-dashboard').classList.add('hidden');
+            document.getElementById('section-calculator').classList.add('hidden');
+            document.getElementById('section-rules').classList.add('hidden');
+
+            // Reset Tab Button Styles
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('bg-gradient-to-r', 'from-emerald-500', 'to-teal-500', 'text-slate-950', 'shadow-md');
+                btn.classList.add('text-slate-400');
+            });
+
+            // Show Active Section
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            activeBtn.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-teal-500', 'text-slate-950', 'shadow-md');
+            activeBtn.classList.remove('text-slate-400');
+        }
+
+        // ================= DASHBOARD & MEAL TRACKER LOGIC =================
+        const mealForm = document.getElementById('meal-form');
+
+        mealForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newMeal = {
+                id: Date.now(),
+                name: document.getElementById('meal-name').value.trim(),
+                time: document.getElementById('meal-time').value,
+                calories: parseFloat(document.getElementById('meal-calories').value) || 0,
+                protein: parseFloat(document.getElementById('meal-protein').value) || 0,
+                carbs: parseFloat(document.getElementById('meal-carbs').value) || 0,
+                fat: parseFloat(document.getElementById('meal-fat').value) || 0
+            };
+
+            meals.push(newMeal);
+            saveData();
+            updateDashboardUI();
+            mealForm.reset();
+        });
+
+        function deleteMeal(id) {
+            meals = meals.filter(m => m.id !== id);
+            saveData();
+            updateDashboardUI();
+        }
+
+        function clearAllMeals() {
+            if (meals.length === 0) return;
+            if (confirm("Apakah Anda yakin ingin menghapus seluruh catatan makanan hari ini?")) {
+                meals = [];
+                saveData();
+                updateDashboardUI();
+            }
+        }
+
+        function updateDashboardUI() {
+            // Calculate Totals
+            let totalCal = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+
+            meals.forEach(meal => {
+                totalCal += meal.calories;
+                totalProtein += meal.protein;
+                totalCarbs += meal.carbs;
+                totalFat += meal.fat;
+            });
+
+            // Update Progress Cards
+            // Calories
+            const calPercent = Math.min(Math.round((totalCal / userGoals.calories) * 100), 100);
+            document.getElementById('dash-calories-text').innerText = `${totalCal} / ${userGoals.calories} kcal`;
+            document.getElementById('dash-calories-bar').style.width = `${calPercent}%`;
+            document.getElementById('dash-calories-left').innerText = Math.max(userGoals.calories - totalCal, 0);
+            document.getElementById('dash-calories-percent').innerText = `${calPercent}%`;
+
+            // Change progress bar color if over-limit
+            const calBar = document.getElementById('dash-calories-bar');
+            if (totalCal > userGoals.calories) {
+                calBar.className = 'bg-gradient-to-r from-rose-600 to-red-500 h-full rounded-full transition-all duration-500';
+            } else {
+                calBar.className = 'bg-gradient-to-r from-amber-500 to-orange-400 h-full rounded-full transition-all duration-500';
+            }
+
+            // Protein
+            const pPercent = Math.min(Math.round((totalProtein / userGoals.protein) * 100), 100);
+            document.getElementById('dash-protein-text').innerText = `${totalProtein} / ${userGoals.protein} g`;
+            document.getElementById('dash-protein-bar').style.width = `${pPercent}%`;
+            document.getElementById('dash-protein-percent').innerText = `${pPercent}%`;
+
+            // Carbs
+            const cPercent = Math.min(Math.round((totalCarbs / userGoals.carbs) * 100), 100);
+            document.getElementById('dash-carbs-text').innerText = `${totalCarbs} / ${userGoals.carbs} g`;
+            document.getElementById('dash-carbs-bar').style.width = `${cPercent}%`;
+            document.getElementById('dash-carbs-percent').innerText = `${cPercent}%`;
+
+            // Fat
+            const fPercent = Math.min(Math.round((totalFat / userGoals.fat) * 100), 100);
+            document.getElementById('dash-fat-text').innerText = `${totalFat} / ${userGoals.fat} g`;
+            document.getElementById('dash-fat-bar').style.width = `${fPercent}%`;
+            document.getElementById('dash-fat-percent').innerText = `${fPercent}%`;
+
+            // Render Meal List Items
+            renderMealList();
+        }
+
+        function renderMealList() {
+            const container = document.getElementById('meal-list-container');
+            if (meals.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-slate-600">
+                        <i class="fa-solid fa-utensils text-4xl mb-3 opacity-40"></i>
+                        <p class="text-xs font-medium">Belum ada makanan yang dicatat hari ini.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const times = ['Sarapan', 'Makan Siang', 'Makan Malam', 'Cemilan'];
+            let html = '';
+
+            times.forEach(time => {
+                const group = meals.filter(m => m.time === time);
+                if (group.length > 0) {
+                    html += `
+                        <div class="border-b border-slate-800/80 pb-4 last:border-0">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                                <i class="fa-regular fa-clock text-emerald-400"></i> ${time}
+                            </h4>
+                            <div class="space-y-2.5">
+                    `;
+
+                    group.forEach(meal => {
+                        html += `
+                            <div class="flex justify-between items-center bg-slate-900/90 p-4 rounded-2xl border border-slate-800/80 hover:border-slate-700 transition-all">
+                                <div>
+                                    <h5 class="text-sm font-bold text-white">${escapeHtml(meal.name)}</h5>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">
+                                        <span class="text-amber-400 font-semibold">${meal.calories} kcal</span> | Protein: ${meal.protein}g | Karbo: ${meal.carbs}g | Lemak: ${meal.fat}g
+                                    </p>
+                                </div>
+                                <button onclick="deleteMeal(${meal.id})" class="text-slate-500 hover:text-rose-400 p-2 transition-colors">
+                                    <i class="fa-solid fa-trash-can text-sm"></i>
+                                </button>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                }[m];
+            });
+        }
+
+        // ================= WATER TRACKER LOGIC =================
+        function addWater(amount) {
+            currentWater += amount;
+            saveData();
+            updateWaterUI();
+        }
+
+        function resetWater() {
+            currentWater = 0;
+            saveData();
+            updateWaterUI();
+        }
+
+        function updateWaterTarget() {
+            const input = document.getElementById('water-target-input');
+            const val = parseInt(input.value);
+            if (val && val > 0) {
+                userGoals.water = val;
+                saveData();
+                updateWaterUI();
+            }
+        }
+
+        function updateWaterUI() {
+            document.getElementById('water-current-text').innerText = currentWater;
+            document.getElementById('water-target-text').innerText = userGoals.water;
+            document.getElementById('water-target-input').value = userGoals.water;
+
+            const percent = Math.min(Math.round((currentWater / userGoals.water) * 100), 100);
+            const circle = document.getElementById('water-progress-circle');
+            
+            // SVG dasharray calculation
+            circle.setAttribute('stroke-dasharray', `${percent}, 100`);
+        }
+
+        // ================= CALCULATOR LOGIC (MIFFLIN-ST JEOR) =================
+        function calculateNutrition() {
+            const gender = document.getElementById('calc-gender').value;
+            const age = parseFloat(document.getElementById('calc-age').value);
+            const height = parseFloat(document.getElementById('calc-height').value);
+            const weight = parseFloat(document.getElementById('calc-weight').value);
+            const activity = parseFloat(document.getElementById('calc-activity').value);
+            const goal = document.getElementById('calc-goal').value;
+
+            if (!age || !height || !weight) {
+                alert("Harap isi semua data fisik dengan benar!");
+                return;
+            }
+
+            // 1. Calculate BMR (Mifflin-St Jeor Equation)
+            let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+            if (gender === 'male') {
+                bmr += 5;
+            } else {
+                bmr -= 161;
+            }
+
+            // 2. Calculate TDEE
+            let tdee = bmr * activity;
+
+            // 3. Adjust for Goal
+            let targetCalories = tdee;
+            if (goal === 'weight-loss') {
+                targetCalories -= 500;
+            } else if (goal === 'weight-gain') {
+                targetCalories += 500;
+            }
+
+            targetCalories = Math.round(targetCalories);
+
+            // 4. Calculate Macronutrients Ratio (Protein 30%, Carbs 50%, Fat 20%)
+            const proteinCal = targetCalories * 0.30;
+            const carbsCal = targetCalories * 0.50;
+            const fatCal = targetCalories * 0.20;
+
+            const proteinGrams = Math.round(proteinCal / 4);
+            const carbsGrams = Math.round(carbsCal / 4);
+            const fatGrams = Math.round(fatCal / 9);
+
+            // Update UI Results
+            document.getElementById('res-bmr').innerText = `${Math.round(bmr)} kcal`;
+            document.getElementById('res-tdee').innerText = `${Math.round(tdee)} kcal`;
+            document.getElementById('res-target-cal').innerText = `${targetCalories} kcal`;
+
+            document.getElementById('res-protein-g').innerText = `${proteinGrams} g`;
+            document.getElementById('res-protein-cal').innerText = `${Math.round(proteinCal)} kcal`;
+
+            document.getElementById('res-carbs-g').innerText = `${carbsGrams} g`;
+            document.getElementById('res-carbs-cal').innerText = `${Math.round(carbsCal)} kcal`;
+
+            document.getElementById('res-fat-g').innerText = `${fatGrams} g`;
+            document.getElementById('res-fat-cal').innerText = `${Math.round(fatCal)} kcal`;
+
+            // Temporarily store calculated values in data attribute
+            document.getElementById('calc-results').dataset.calculatedGoals = JSON.stringify({
+                calories: targetCalories,
+                protein: proteinGrams,
+                carbs: carbsGrams,
+                fat: fatGrams,
+                water: userGoals.water
+            });
+        }
+
+        function applyCalculatedGoals() {
+            const dataStr = document.getElementById('calc-results').dataset.calculatedGoals;
+            if (!dataStr) {
+                calculateNutrition();
+            }
+            const calculated = JSON.parse(document.getElementById('calc-results').dataset.calculatedGoals);
+            userGoals = calculated;
+            saveData();
+            updateDashboardUI();
+            switchTab('dashboard');
+        }
+
+        // ================= DIET RULES FILTER LOGIC =================
+        function filterDiet(category) {
+            const cards = document.querySelectorAll('.diet-card');
+            const buttons = document.querySelectorAll('.diet-btn');
+
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-gradient-to-r', 'from-emerald-500', 'to-teal-500', 'text-slate-950', 'shadow-md');
+                btn.classList.add('bg-slate-900', 'text-slate-400');
+            });
+
+            event.target.classList.remove('bg-slate-900', 'text-slate-400');
+            event.target.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-teal-500', 'text-slate-950', 'shadow-md');
+
+            cards.forEach(card => {
+                const cats = card.dataset.category.split(' ');
+                if (category === 'all' || cats.includes(category)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        // ================= INITIALIZATION =================
+        window.onload = function() {
+            calculateNutrition();
+            updateDashboardUI();
+            updateWaterUI();
+        };
+    </script>
+</body>
+</html>
